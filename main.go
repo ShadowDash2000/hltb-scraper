@@ -119,6 +119,7 @@ func main() {
 		}
 
 		totalPages := firstRes.PageTotal
+		log.Printf("Total pages: %d", totalPages)
 		for p := 2; p <= totalPages; p++ {
 			time.Sleep(rand.N(100 * time.Millisecond))
 
@@ -150,5 +151,5 @@ func main() {
 	}
 
 	log.Printf("Scraping completed. Result written to %s", outName)
-	log.Printf("API reported firstRes.Count=%d; actually written=%d", reportedCount, wroteCount.Load())
+	log.Printf("API reported total count=%d; actually written=%d", reportedCount, wroteCount.Load())
 }
