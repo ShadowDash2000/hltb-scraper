@@ -1,0 +1,46 @@
+name: Run HLTB Scraper and Upload JSON
+
+on:
+  workflow_dispatch:  # allows manual trigger
+  schedule:
+    - cron: '0 1 * * 0'  # every Sunday at 01:00 UTC
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 1440
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Get current date (compact)
+        id: date_compact
+        run: echo "date_compact=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Run scraper
+        run: go run .
+
+      - name: Upload JSON artifact
+        uses: ncipollo/release-action@v1
+        if: success()
+        with:
+          makeLatest: true
+          removeArtifacts: true
+          artifacts: hltb-${{ steps.date_compact.outputs.date_compact }}.json
+          commit: ${{ github.sha }}
+          tag: "scrape-${{ steps.date.outputs.date }}"
+          name: "Weekly Scrape - ${{ steps.date.outputs.date }}"
