@@ -29,10 +29,10 @@ jobs:
         run: echo "date_compact=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
 
       - name: Build
-        run: go build -v ./...
+        run: go build -v -o scraper .
 
       - name: Run scraper
-        run: go run .
+        run: ./scraper
 
       - name: Upload JSON artifact
         uses: ncipollo/release-action@v1
