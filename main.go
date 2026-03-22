@@ -116,7 +116,7 @@ func (s *Scraper) fetchPage(p int, sleep bool) (*howlongtobeat.SearchGame, error
 	if sleep {
 		time.Sleep(rand.N(100 * time.Millisecond))
 	}
-	res, err := s.hltb.Search(s.ctx, "", howlongtobeat.SearchModifierNone, &howlongtobeat.SearchOptions{
+	res, err := s.hltb.SearchAll(s.ctx, howlongtobeat.SearchModifierNone, &howlongtobeat.SearchOptions{
 		Pagination: &howlongtobeat.SearchGamePagination{
 			Page:     p,
 			PageSize: s.pageSize,
