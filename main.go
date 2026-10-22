@@ -32,7 +32,7 @@ type Scraper struct {
 
 func NewScraper(ctx context.Context, outName string, f *os.File, workers int, pageSize int) *Scraper {
 	client, err := howlongtobeat.New(
-		howlongtobeat.WithRateLimit(time.Second/3, 1),
+		howlongtobeat.WithRateLimit(time.Second/2, 1),
 	)
 	if err != nil {
 		log.Fatalf("hltb.New error: %v", err)
@@ -116,10 +116,12 @@ func (s *Scraper) processFirstPage() {
 
 func (s *Scraper) fetchPage(p int, sleep bool) (*howlongtobeat.SearchGame, error) {
 	if sleep {
-		time.Sleep(rand.N(100 * time.Millisecond))
+		// [3, 5]
+		seconds := rand.N(5) + 3
+		time.Sleep(time.Duration(seconds) * time.Second)
 	}
 
-	const maxRetries = 3
+	const maxRetries = 10
 	var res *howlongtobeat.SearchGame
 	var err error
 
