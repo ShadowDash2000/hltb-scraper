@@ -126,17 +126,21 @@ func (s *Scraper) fetchPage(p int, sleep bool) (*howlongtobeat.SearchGame, error
 	var err error
 
 	for i := range maxRetries {
-		res, err = s.hltb.SearchAll(s.ctx, howlongtobeat.SearchModifierNone, &howlongtobeat.SearchOptions{
+		ctx, cancel := context.WithTimeout(s.ctx, time.Minute)
+		res, err = s.hltb.SearchAll(ctx, howlongtobeat.SearchModifierNone, &howlongtobeat.SearchOptions{
 			Pagination: &howlongtobeat.SearchGamePagination{
 				Page:     p,
 				PageSize: s.pageSize,
 			},
 			Search: false,
 		})
+		cancel()
 		if err == nil {
 			return res, nil
 		}
+
 		log.Printf("Error fetching page %d (attempt %d/%d): %v", p, i+1, maxRetries, err)
+
 		if i < maxRetries-1 {
 			time.Sleep(time.Duration(1+i) * time.Second)
 		}
